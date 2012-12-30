@@ -1,0 +1,62 @@
+﻿<div data-bind="with: session">    
+    <div class="titleblock">
+        <h1 data-bind="text:title"></h1>
+    </div>
+    <div class="details-left">
+        <div>
+            <label>Track</label>
+            <address data-bind="text: track().name"></address>
+        </div>
+        <div>
+            <label>Time slot</label>
+            <address data-bind="text: timeslot().shortStart"></address>
+        </div>
+        <div>
+            <label>Room</label>
+            <address data-bind="text: room().name"></address>
+        </div>
+        <div>
+            <label>Code</label>
+            <address data-bind="text: code"></address>
+        </div>
+        <div>
+            <label>Level</label>
+            <address data-bind="text: level"></address>
+        </div>
+        <div>
+            <label>Tags</label>
+            <address data-bind="text: tagsFormatted"></address>
+        </div>
+        <a data-bind="attr: {href: speaker().speakerHash, title: speaker().fullName}">
+            <img data-bind="attr: {src: speaker().imageName}" />
+            <address data-bind="text: speaker().fullName"></address>
+        </a>
+    </div>
+    <div class="details-right">
+        <div>
+            <!--
+                FOR DEBUGGING
+                <span data-bind="text:$parent.isDirty"></span>
+                <span data-bind="text:isDirty"></span>
+                <span data-bind="text:attendance().isDirty"></span>
+             -->
+
+            <label>Description</label>
+            <span class="scrollable-text" data-bind="text: description"></span>
+        </div>
+        <div>
+            <label>Feedback</label>
+            <textarea data-bind="value: attendance().text, valueUpdate: 'afterkeydown', enable:isFavorite"
+                 placeholder="Enter feedback"></textarea>
+        </div>
+        <div>
+            <span data-bind="starRating: attendance().rating, enable:isFavorite"></span>
+        </div>
+        <div>
+            <small class="tips" data-bind="hidden:isFavorite">Must favorite this session before being able to rate it.</small>
+        </div>
+        <button data-bind="favoriteCheckbox: {enable: isUnlocked, checked: isFavorite}, 
+            command: $parent.saveFavoriteCmd"
+            class="markfavorite-no-float"></button>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>KoLite</id>
+    <version>1.0.4</version>
+    <title>KoLite - Lightweight Toolkit for KnockoutJS</title>
+    <authors>John Papa, Hans Fjällemark</authors>
+    <owners>John Papa, Hans Fjällemark</owners>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>https://github.com/CodeSeven/KoLite</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>KoLite contains a set of helpers to aid in creating MVVM applications using JavaScript and Knockout. Including:
+
+asyncCommand
+activity
+dirtyFlag
+
+For a quick start, see http://jpapa.me/kolitegh</description>
+    <summary>KoLite contains a set of helpers to aid in creating MVVM applications using JavaScript and Knockout.</summary>
+    <releaseNotes>Updated command binding handler to perform click binding by default, then look for a KO binding handler, and finally to look for the name of an event.</releaseNotes>
+    <copyright>Copyright © 2012 Hans Fjällemark &amp; John Papa.</copyright>
+    <language>en-US</language>
+    <tags>knockout, jquery, kolite</tags>
+    <dependencies>
+      <dependency id="knockoutjs" version="2.0.0" />
+      <dependency id="jQuery" version="1.4.4" />
+    </dependencies>
+  </metadata>
+</package>

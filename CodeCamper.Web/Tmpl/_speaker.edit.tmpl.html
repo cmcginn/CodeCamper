@@ -1,0 +1,49 @@
+﻿<div data-bind="with: speaker">
+    <div class="titleblock">
+        <h1 data-bind="text:fullName"></h1>
+    </div>
+    <div class="details-left">
+        <div>
+            <img data-bind="attr: {src: imageName}" />
+        </div>
+        <div>
+            <label>First Name</label>
+            <input data-bind="value: firstName" placeholder="John" />
+        </div>
+        <div>
+            <label>Last Name</label>
+            <input data-bind="value: lastName" placeholder="Papa" />
+        </div>
+        <div>
+            <label>Email</label>
+            <input type="email" data-bind="value: email" placeholder="john@contoso.com" title="Email (ex: john@contoso.com)" />
+        </div>
+        <div>
+            <label>Twitter</label>
+            <input data-bind="value: twitter" placeholder="@john_papa" title="Twitter (ex: @john_papa)"/>
+        </div>
+        <div>
+            <label>Blog</label>
+            <input type="url" data-bind="value: blog" placeholder="http://www.contoso.com" title="Url (ex: www.contoso.com)"/>
+        </div>
+    </div>
+    <div class="details-right">
+        <div>
+            <label for="bio">Bio</label>
+            <textarea id="bio" class="scrollable-text" 
+                placeholder="Enter speaker biography"
+                data-bind="value: bio, valueUpdate: 'afterkeydown'"></textarea>
+        </div>
+    </div>
+    <div class="details-bottom">
+        <label>Sessions</label>
+        <ul data-bind="foreach: speakerSessions">
+            <li>
+                <a data-bind="attr: {href: sessionHash, title: title}">
+                    <span data-bind="text: title"></span>
+                    [ <span data-bind="text: timeslot().shortStart"></span> ]
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

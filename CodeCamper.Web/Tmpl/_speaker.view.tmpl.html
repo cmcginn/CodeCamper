@@ -1,0 +1,38 @@
+﻿<div data-bind="with: speaker">
+    <div class="titleblock">
+        <h1 data-bind="text:fullName"></h1>
+    </div>
+    <div class="details-left">
+        <img data-bind="attr: {src: imageName}" />
+        <address data-bind="text: fullName"></address>
+        <div>
+            <label>Email</label>
+            <a data-bind="attr: {href: email, title: email}, text: email"></a>
+        </div>
+        <div>
+            <label>Twitter</label>
+            <a data-bind="attr: {href: twitterLink, title: twitter}, text: twitter"></a>
+        </div>
+        <div>
+            <label>Blog</label>
+            <a data-bind="attr: {href: blog, title: blog}, text: blog"></a>
+        </div>
+    </div>
+    <div class="details-right">
+        <div>
+            <label for="bio">Bio</label>
+            <span id="bio" class="scrollable-text" data-bind="text: bio"></span>
+        </div>
+    </div>
+    <div class="details-bottom" data-bind="if: speakerSessions().length">
+        <label>Sessions</label>
+        <ul data-bind="foreach: speakerSessions">
+            <li>
+                <a data-bind="attr: {href: sessionHash, title: title}">
+                    <span data-bind="text: title"></span>
+                    [ <span data-bind="text: timeslot().shortStart"></span> ]
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
