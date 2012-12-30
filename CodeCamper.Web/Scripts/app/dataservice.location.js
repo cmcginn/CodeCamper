@@ -5,6 +5,20 @@
             dataType: 'json',
             type: 'GET'
         });
+        amplify.request.define('sublocations', 'ajax', {
+            url: '/api/locations/{id}',
+            dataType: 'json',
+            type: 'GET'
+        });
+      
+    };
+    getSubLocations= function (callbacks, id) {
+        return amplify.request({
+            resourceId: 'sublocations',
+            data: { id: id },
+            success: callbacks.success,
+            error: callbacks.error
+        });
     };
     getLocations = function(callbacks) {
         return amplify.request({
@@ -15,6 +29,7 @@
     };
     init();
     return {
-       getLocations:getLocations 
+        getLocations: getLocations,
+        getSubLocations: getSubLocations
     };
 });

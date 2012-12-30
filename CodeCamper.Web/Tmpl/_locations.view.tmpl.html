@@ -1,6 +1,8 @@
 ﻿<div data-bind="foreach:locations">
-    <div data-bind="countries:name">
+    <div class="countries-list" data-bind="countries:name">
         <span data-bind="text:name"></span>
-        <div></div>
+        <div data-bind="foreach:locations">
+            <span data-bind="text:name"></span>
+        </div>
     </div>
-</div>s
+</div>

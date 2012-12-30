@@ -28,6 +28,7 @@
             model.Attendance.datacontext(dc);
             model.Person.datacontext(dc);
             model.Session.datacontext(dc);
+            model.Location.datacontext(dc);
         };
 
         return model;

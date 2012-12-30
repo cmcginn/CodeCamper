@@ -4,7 +4,7 @@
         var
             sessionBriefSelector = '.session-brief',
             favoriteSelector = 'button.markfavorite',
-            
+            countriesSelector = '.countries-list',
             bindEventToList = function (rootSelector, selector, callback, eventName) {
                 var eName = eventName || 'click';
                 $(rootSelector).on(eName, selector, function () {
@@ -15,7 +15,7 @@
                     return false;
                 });
             },
-
+            
             favoritesListItem = function (callback, eventName) {
                 bindEventToList(config.viewIds.favorites, sessionBriefSelector, callback, eventName);
             },
@@ -27,7 +27,9 @@
             favoritesFavorite = function (callback, eventName) {
                 bindEventToList(config.viewIds.favorites, favoriteSelector, callback, eventName);
             },
-
+            countriesSelect = function (callback, eventName) {
+                bindEventToList(config.viewIds.locations, countriesSelector, callback, eventName);
+            },
             sessionsFavorite = function (callback, eventName) {
                 bindEventToList(config.viewIds.sessions, favoriteSelector, callback, eventName);
             };
@@ -36,7 +38,8 @@
             favoritesListItem: favoritesListItem,
             favoritesFavorite: favoritesFavorite,
             sessionsListItem: sessionsListItem,
-            sessionsFavorite: sessionsFavorite
+            sessionsFavorite: sessionsFavorite,
+            countriesSelect: countriesSelect
         };
     });
 

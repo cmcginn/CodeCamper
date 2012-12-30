@@ -3,6 +3,9 @@
         amplify.request.define('locations', function(settings) {
             settings.success(model.generateLocations().locations);
         });
+        amplify.request.define('sublocations', function (settings) {
+            settings.success(model.generateSubLocations().locations);
+        });
     };
     return {
         defineApi: defineApi

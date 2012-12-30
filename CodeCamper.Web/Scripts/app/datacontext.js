@@ -147,7 +147,7 @@
             speakerSessions = new SpeakerSessions.SpeakerSessions(persons, sessions);
             bookings = new EntitySet(dataservice.booking.getBookings, modelmapper.booking, model.Booking.Nullo),
             locations = new EntitySet(dataservice.location.getLocations,modelmapper.location,model.Location.Nullo),
-        
+           
         
             // Attendance extensions
             attendance.addData = function (sessionModel, callbacks) {
@@ -298,29 +298,46 @@
             };
 
             sessions.getSessionsAndAttendance = function (options) {
-                return $.Deferred(function(def) {
-                    $.when(
-                        sessions.getData(options),
-                        datacontext.attendance.getData(
+                return $.Deferred(function (def) {
+                    var
+                        id = model.Attendance.makeId(getCurrentUserId(), sessionId),
+                        att = attendance.getLocalById(id);
+
+                    if (att.isNullo || forceRefresh) {
+                        // get fresh from database
+                        dataservice.attendance.getAttendance(
                             {
-                                param: options.currentUserId,
-                                forceRefresh: options.forceRefresh
-                            })
-                        )
-                        .done(function () { def.resolve(); })
-                        .fail(function () { def.reject(); });
+                                success: function (dto) {
+                                    // updates the session returned from getLocalById() above
+                                    att = attendance.mapDtoToContext(dto);
+                                    if (callbacks && callbacks.success) { callbacks.success(att); }
+                                    def.resolve(dto);
+                                },
+                                error: function (response) {
+                                    logger.error('oops! could not retrieve attendance ' + sessionId);
+                                    if (callbacks && callbacks.error) { callbacks.error(response); }
+                                    def.reject(response);
+                                }
+                            },
+                            getCurrentUserId(),
+                            sessionId
+                        );
+                    } else {
+                        if (callbacks && callbacks.success) { callbacks.success(att); }
+                        def.resolve(att);
+                    }
                 }).promise();
             };
         
             // extend Persons entitySet 
             persons.getSpeakers = function (options) {
-                return $.Deferred(function(def) {
+                return $.Deferred(function (def) {
                     _.extend(options, {
                         getFunctionOverride: dataservice.person.getSpeakers
                     });
                     $.when(persons.getData(options))
-                        .done(function() { def.resolve(); })
-                        .fail(function() { def.reject(); });
+                        .done(function () { def.resolve(); })
+                        .fail(function () { def.reject(); });
                 }).promise();
             },
 
@@ -350,13 +367,29 @@
                     }
                 }).promise();
             },
-           
-            // Get the sessions in cache for which this person is 
-            // a speaker from local data (no 'promise')
+
+        // Get the sessions in cache for which this person is 
+        // a speaker from local data (no 'promise')
             persons.getLocalSpeakerSessions = function (personId) {
                 return speakerSessions.getLocalSessionsBySpeakerId(personId);
+            },
+        //locations extensions
+            locations.getSubLocations = function (location,callbacks) {
+                return $.Deferred(function (def) {
+                    var loc = location;
+                    dataservice.location.getSubLocations({
+                        success: function (dto) {
+                            location.locations(dto);
+                            if (callbacks &&  callbacks.success) { callbacks.success(dto); }
+                        },
+                        error: function (response) {
+                            logger.error('oops! could not retrieve state provinces' + id);
+                            if (callbacks && callbacks.error) { callbacks.error(response); }
+                            def.reject(response);
+                        }
+                    })
+                }).promise();
             };
-
         var datacontext = {
             attendance: attendance,
             persons: persons,
