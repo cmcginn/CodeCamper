@@ -4,7 +4,7 @@
         self.id = ko.observable();
         self.name = ko.observable();
         self.isNullo = false;
-        self.isSelected = ko.observable();        
+        self.isSelected = ko.observable();
         self.locations = ko.observable();
         return self;
     };

@@ -98,6 +98,6 @@
             timeSlot: timeSlot,
             track: track,
             booking: booking,
-            location:location
+            location: location
         };
     });

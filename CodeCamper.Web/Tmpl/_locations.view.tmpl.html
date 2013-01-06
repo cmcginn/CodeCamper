@@ -2,7 +2,18 @@
     <div class="countries-list" data-bind="countries:name">
         <span data-bind="text:name"></span>
         <div data-bind="foreach:locations">
-            <span data-bind="text:name"></span>
+            <div class="stateProvinces-list" data-bind="stateProvinces:name">
+                <span data-bind="text:name"></span>
+                <div data-bind="foreach:locations">
+                    <div>
+                        <div style="width:25px;float:left">
+                            <input type="checkbox" style="display:block" value="0"/>
+                        </div>
+                        <span data-bind="text:name"></span>
+                        <div style="clear:both"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

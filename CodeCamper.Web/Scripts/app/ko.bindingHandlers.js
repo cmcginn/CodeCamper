@@ -147,10 +147,33 @@ function ($, ko,messenger) {
             $(element).accordion({
                 collapsible: true,
                 active: false,
+                heightStyle:'content',
                 beforeActivate:function(e) {
                     ko.dataFor(element).isSelected(true);
                 }
             });
+        }
+    };
+    // stateProvinceAccordion
+    //--------------------------
+    ko.bindingHandlers.stateProvinces = {
+        init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+            $(element).accordion({
+                collapsible: true,
+                active: false,
+                heightStyle: 'content',
+                beforeActivate: function(e) {
+                    ko.dataFor(element).isSelected(true);
+                }
+            });
+        }
+    },
+    ko.bindingHandlers.cities = {
+        update:function(element, valueAccessor, allBindingsAccessor, viewModel) {
+            console.log(viewModel);
+            if(viewModel.isSelected())
+                $(element).attr('checked',true);
+            //viewModel.isSelected(true);
         }
     };
 });

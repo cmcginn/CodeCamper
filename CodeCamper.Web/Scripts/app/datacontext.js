@@ -1,12 +1,12 @@
-﻿define('datacontext', 
+﻿define('datacontext',
     ['jquery', 'underscore', 'ko', 'model', 'model.mapper', 'dataservice', 'config', 'utils', 'datacontext.speaker-sessions'],
-    function ($, _, ko, model, modelmapper, dataservice, config, utils, SpeakerSessions) {
-    
+    function($, _, ko, model, modelmapper, dataservice, config, utils, SpeakerSessions) {
+
         var logger = config.logger,
             getCurrentUserId = function() {
                 return config.currentUser().id();
             },
-            itemsToArray = function (items, observableArray, filter, sortFunction) {
+            itemsToArray = function(items, observableArray, filter, sortFunction) {
                 // Maps the memo to an observableArray, 
                 // then returns the observableArray
                 if (!observableArray) return;
@@ -33,7 +33,7 @@
                     var existingItem = items[id];
                     memo[id] = mapper.fromDto(dto, existingItem);
                     return memo;
-                }, { });
+                }, {});
                 itemsToArray(items, results, filter, sortFunction);
                 //logger.success('received with ' + dtoList.length + ' elements');
                 return items; // must return these
@@ -59,7 +59,7 @@
                     },
                     getAllLocal = function() {
                         return utils.mapMemoToArray(items);
-                    },                    
+                    },
                     getData = function(options) {
                         return $.Deferred(function(def) {
                             var results = options && options.results,
@@ -80,7 +80,7 @@
                                         items = mapToContext(dtoList, items, results, mapper, filter, sortFunction);
                                         def.resolve(results);
                                     },
-                                    error: function (response) {
+                                    error: function(response) {
                                         logger.error(config.toasts.errorGettingData);
                                         def.reject();
                                     }
@@ -97,8 +97,10 @@
 
                         return $.Deferred(function(def) {
                             if (!updateFunction) {
-                                logger.error('updateData method not implemented'); 
-                                if (callbacks && callbacks.error) { callbacks.error(); }
+                                logger.error('updateData method not implemented');
+                                if (callbacks && callbacks.error) {
+                                    callbacks.error();
+                                }
                                 def.reject();
                                 return;
                             }
@@ -107,12 +109,16 @@
                                 success: function(response) {
                                     logger.success(config.toasts.savedData);
                                     entity.dirtyFlag().reset();
-                                    if (callbacks && callbacks.success) { callbacks.success(); }
+                                    if (callbacks && callbacks.success) {
+                                        callbacks.success();
+                                    }
                                     def.resolve(response);
                                 },
                                 error: function(response) {
                                     logger.error(config.toasts.errorSavingData);
-                                    if (callbacks && callbacks.error) { callbacks.error(); }
+                                    if (callbacks && callbacks.error) {
+                                        callbacks.error();
+                                    }
                                     def.reject(response);
                                     return;
                                 }
@@ -129,8 +135,7 @@
                     removeById: removeById,
                     updateData: updateData
                 };
-            },
-        
+            },        
             //----------------------------------
             // Repositories
             //
@@ -146,250 +151,285 @@
             tracks = new EntitySet(dataservice.lookup.getTracks, modelmapper.track, model.Track.Nullo),
             speakerSessions = new SpeakerSessions.SpeakerSessions(persons, sessions);
             bookings = new EntitySet(dataservice.booking.getBookings, modelmapper.booking, model.Booking.Nullo),
-            locations = new EntitySet(dataservice.location.getLocations,modelmapper.location,model.Location.Nullo),
-           
-        
-            // Attendance extensions
-            attendance.addData = function (sessionModel, callbacks) {
-                var attendanceModel = new model.Attendance()
-                        .sessionId(sessionModel.id())
-                        .personId(getCurrentUserId()),
-                        attendanceModelJson = ko.toJSON(attendanceModel);
+            locations = new EntitySet(dataservice.location.getLocations, modelmapper.location, model.Location.Nullo),
+          
+        // Attendance extensions
+        attendance.addData = function(sessionModel, callbacks) {
+            var attendanceModel = new model.Attendance()
+                .sessionId(sessionModel.id())
+                .personId(getCurrentUserId()),
+                attendanceModelJson = ko.toJSON(attendanceModel);
 
-                return $.Deferred(function (def) {
-                    dataservice.attendance.addAttendance({
-                        success: function (dto) {
-                            if (!dto) {
-                                logger.error(config.toasts.errorSavingData);
-                                if (callbacks && callbacks.error) { callbacks.error(); }
-                                def.reject();
-                                return;
+            return $.Deferred(function(def) {
+                dataservice.attendance.addAttendance({
+                    success: function(dto) {
+                        if (!dto) {
+                            logger.error(config.toasts.errorSavingData);
+                            if (callbacks && callbacks.error) {
+                                callbacks.error();
                             }
-                            var newAtt = modelmapper.attendance.fromDto(dto); // Map DTO to Model
-                            attendance.add(newAtt); // Add to the datacontext
-                            sessionModel.isFavoriteRefresh.valueHasMutated(); // Trigger re-evaluation of isFavorite
-                            logger.success(config.toasts.savedData);
-                            if (callbacks && callbacks.success) { callbacks.success(newAtt); }
-                            def.resolve(dto);
-                        },
-                        error: function (response) {
-                            logger.error(config.toasts.errorSavingData);
-                            if (callbacks && callbacks.error) { callbacks.error(); }
-                            def.reject(response);
+                            def.reject();
                             return;
                         }
-                    }, attendanceModelJson);
-                }).promise();
-            };
-
-            attendance.updateData = function (sessionModel, callbacks) {
-                var
-                    attendanceModel = sessionModel.attendance(),
-                    attendanceModelJson = ko.toJSON(attendanceModel);
-                    
-                return $.Deferred(function(def) {
-                    dataservice.attendance.updateAttendance({
-                        success: function(response) {
-                            logger.success(config.toasts.savedData);
-                            attendanceModel.dirtyFlag().reset();
-                            if (callbacks && callbacks.success) { callbacks.success(); }
-                            def.resolve(response);
-                        },
-                        error: function(response) {
-                            logger.error(config.toasts.errorSavingData);
-                            if (callbacks && callbacks.error) { callbacks.error(); }
-                            def.reject(response);
-                            return;
+                        var newAtt = modelmapper.attendance.fromDto(dto); // Map DTO to Model
+                        attendance.add(newAtt); // Add to the datacontext
+                        sessionModel.isFavoriteRefresh.valueHasMutated(); // Trigger re-evaluation of isFavorite
+                        logger.success(config.toasts.savedData);
+                        if (callbacks && callbacks.success) {
+                            callbacks.success(newAtt);
                         }
-                    }, attendanceModelJson);
-                }).promise();
-            };
-                
-            attendance.deleteData = function (sessionModel, callbacks) {
-                var attendanceModel = sessionModel.attendance();
-                return $.Deferred(function (def) {
-                    dataservice.attendance.deleteAttendance({
-                        success: function (response) {
-                            attendance.removeById(attendanceModel.id());
-                            sessionModel.isFavoriteRefresh.valueHasMutated(); // Trigger re-evaluation of isFavorite
-                            logger.success(config.toasts.savedData); 
-                            if (callbacks && callbacks.success) { callbacks.success(); }
-                            def.resolve(response);
-                        },
-                        error: function (response) {
-                            logger.error(config.toasts.errorSavingData);
-                            if (callbacks && callbacks.error) { callbacks.error(); }
-                            def.reject(response);
-                            return;
+                        def.resolve(dto);
+                    },
+                    error: function(response) {
+                        logger.error(config.toasts.errorSavingData);
+                        if (callbacks && callbacks.error) {
+                            callbacks.error();
                         }
-                    }, attendanceModel.personId(), attendanceModel.sessionId());
-                }).promise();
-            };
-
-            // Extend Attendance entityset with ability to get attendance for the current user (aka, the favorite)
-            // This is a "Local" method, so it gets it from the DC only, no promise returned, no callbacks.
-            attendance.getLocalSessionFavorite = function (sessionId) {
-                var
-                    id = model.Attendance.makeId(getCurrentUserId(), sessionId),
-                    att = attendance.getLocalById(id);
-                return att;
-            };
-
-            // Extend Attendance entityset with ability to get attendance for the current user (aka, the favorite)
-            attendance.getSessionFavorite = function (sessionId, callbacks, forceRefresh) {
-                return $.Deferred(function (def) {
-                    var
-                        id = model.Attendance.makeId(getCurrentUserId(), sessionId),
-                        att = attendance.getLocalById(id);
-
-                    if (att.isNullo || forceRefresh) {
-                        // get fresh from database
-                        dataservice.attendance.getAttendance(
-                            {
-                                success: function (dto) {
-                                    // updates the session returned from getLocalById() above
-                                    att = attendance.mapDtoToContext(dto);
-                                    if (callbacks && callbacks.success) { callbacks.success(att); }
-                                    def.resolve(dto);
-                                },
-                                error: function (response) {
-                                    logger.error('oops! could not retrieve attendance ' + sessionId); 
-                                    if (callbacks && callbacks.error) { callbacks.error(response); }
-                                    def.reject(response);
-                                }
-                            },
-                            getCurrentUserId(),
-                            sessionId
-                        );
-                    } else {
-                        if (callbacks && callbacks.success) { callbacks.success(att); }
-                        def.resolve(att);
+                        def.reject(response);
+                        return;
                     }
-                }).promise();
-            };
-        
-            // extend Sessions enttityset 
-            sessions.getFullSessionById = function(id, callbacks, forceRefresh) {
-                return $.Deferred(function (def) {
-                    var session = sessions.getLocalById(id);
-                    if (session.isNullo || session.isBrief() || forceRefresh) {
-                        // if nullo or brief, get fresh from database
-                        dataservice.session.getSession({
-                            success: function (dto) {
+                }, attendanceModelJson);
+            }).promise();
+        };
+
+        attendance.updateData = function(sessionModel, callbacks) {
+            var attendanceModel = sessionModel.attendance(),
+                attendanceModelJson = ko.toJSON(attendanceModel);
+
+            return $.Deferred(function(def) {
+                dataservice.attendance.updateAttendance({
+                    success: function(response) {
+                        logger.success(config.toasts.savedData);
+                        attendanceModel.dirtyFlag().reset();
+                        if (callbacks && callbacks.success) {
+                            callbacks.success();
+                        }
+                        def.resolve(response);
+                    },
+                    error: function(response) {
+                        logger.error(config.toasts.errorSavingData);
+                        if (callbacks && callbacks.error) {
+                            callbacks.error();
+                        }
+                        def.reject(response);
+                        return;
+                    }
+                }, attendanceModelJson);
+            }).promise();
+        };
+
+        attendance.deleteData = function(sessionModel, callbacks) {
+            var attendanceModel = sessionModel.attendance();
+            return $.Deferred(function(def) {
+                dataservice.attendance.deleteAttendance({
+                    success: function(response) {
+                        attendance.removeById(attendanceModel.id());
+                        sessionModel.isFavoriteRefresh.valueHasMutated(); // Trigger re-evaluation of isFavorite
+                        logger.success(config.toasts.savedData);
+                        if (callbacks && callbacks.success) {
+                            callbacks.success();
+                        }
+                        def.resolve(response);
+                    },
+                    error: function(response) {
+                        logger.error(config.toasts.errorSavingData);
+                        if (callbacks && callbacks.error) {
+                            callbacks.error();
+                        }
+                        def.reject(response);
+                        return;
+                    }
+                }, attendanceModel.personId(), attendanceModel.sessionId());
+            }).promise();
+        };
+
+        // Extend Attendance entityset with ability to get attendance for the current user (aka, the favorite)
+        // This is a "Local" method, so it gets it from the DC only, no promise returned, no callbacks.
+        attendance.getLocalSessionFavorite = function(sessionId) {
+            var id = model.Attendance.makeId(getCurrentUserId(), sessionId),
+                att = attendance.getLocalById(id);
+            return att;
+        };
+
+        // Extend Attendance entityset with ability to get attendance for the current user (aka, the favorite)
+        attendance.getSessionFavorite = function(sessionId, callbacks, forceRefresh) {
+            return $.Deferred(function(def) {
+                var id = model.Attendance.makeId(getCurrentUserId(), sessionId),
+                    att = attendance.getLocalById(id);
+
+                if (att.isNullo || forceRefresh) {
+                    // get fresh from database
+                    dataservice.attendance.getAttendance(
+                        {
+                            success: function(dto) {
+                                // updates the session returned from getLocalById() above
+                                att = attendance.mapDtoToContext(dto);
+                                if (callbacks && callbacks.success) {
+                                    callbacks.success(att);
+                                }
+                                def.resolve(dto);
+                            },
+                            error: function(response) {
+                                logger.error('oops! could not retrieve attendance ' + sessionId);
+                                if (callbacks && callbacks.error) {
+                                    callbacks.error(response);
+                                }
+                                def.reject(response);
+                            }
+                        },
+                        getCurrentUserId(),
+                        sessionId
+                    );
+                } else {
+                    if (callbacks && callbacks.success) {
+                        callbacks.success(att);
+                    }
+                    def.resolve(att);
+                }
+            }).promise();
+        };
+
+        // extend Sessions enttityset 
+        sessions.getFullSessionById = function(id, callbacks, forceRefresh) {
+            return $.Deferred(function(def) {
+                var session = sessions.getLocalById(id);
+                if (session.isNullo || session.isBrief() || forceRefresh) {
+                    // if nullo or brief, get fresh from database
+                    dataservice.session.getSession({
+                            success: function(dto) {
                                 // updates the session returned from getLocalById() above
                                 session = sessions.mapDtoToContext(dto);
                                 session.isBrief(false); // now a full session
-                                if (callbacks && callbacks.success) { callbacks.success(session); }
+                                if (callbacks && callbacks.success) {
+                                    callbacks.success(session);
+                                }
                                 def.resolve(dto);
                             },
-                            error: function (response) {
-                                logger.error('oops! could not retrieve session ' + id); 
-                                if (callbacks && callbacks.error) { callbacks.error(response); }
+                            error: function(response) {
+                                logger.error('oops! could not retrieve session ' + id);
+                                if (callbacks && callbacks.error) {
+                                    callbacks.error(response);
+                                }
                                 def.reject(response);
                             }
                         },
                         id);
+                } else {
+                    if (callbacks && callbacks.success) {
+                        callbacks.success(session);
                     }
-                    else {
-                        if (callbacks && callbacks.success) { callbacks.success(session); }
-                        def.resolve(session);
-                    }
-                }).promise();
-            };
+                    def.resolve(session);
+                }
+            }).promise();
+        };
 
-            sessions.getSessionsAndAttendance = function (options) {
-                return $.Deferred(function (def) {
-                    var
-                        id = model.Attendance.makeId(getCurrentUserId(), sessionId),
-                        att = attendance.getLocalById(id);
+        sessions.getSessionsAndAttendance = function(options) {
+            return $.Deferred(function(def) {
+                var id = model.Attendance.makeId(getCurrentUserId(), sessionId),
+                    att = attendance.getLocalById(id);
 
-                    if (att.isNullo || forceRefresh) {
-                        // get fresh from database
-                        dataservice.attendance.getAttendance(
-                            {
-                                success: function (dto) {
-                                    // updates the session returned from getLocalById() above
-                                    att = attendance.mapDtoToContext(dto);
-                                    if (callbacks && callbacks.success) { callbacks.success(att); }
-                                    def.resolve(dto);
-                                },
-                                error: function (response) {
-                                    logger.error('oops! could not retrieve attendance ' + sessionId);
-                                    if (callbacks && callbacks.error) { callbacks.error(response); }
-                                    def.reject(response);
+                if (att.isNullo || forceRefresh) {
+                    // get fresh from database
+                    dataservice.attendance.getAttendance(
+                        {
+                            success: function(dto) {
+                                // updates the session returned from getLocalById() above
+                                att = attendance.mapDtoToContext(dto);
+                                if (callbacks && callbacks.success) {
+                                    callbacks.success(att);
                                 }
+                                def.resolve(dto);
                             },
-                            getCurrentUserId(),
-                            sessionId
-                        );
-                    } else {
-                        if (callbacks && callbacks.success) { callbacks.success(att); }
-                        def.resolve(att);
+                            error: function(response) {
+                                logger.error('oops! could not retrieve attendance ' + sessionId);
+                                if (callbacks && callbacks.error) {
+                                    callbacks.error(response);
+                                }
+                                def.reject(response);
+                            }
+                        },
+                        getCurrentUserId(),
+                        sessionId
+                    );
+                } else {
+                    if (callbacks && callbacks.success) {
+                        callbacks.success(att);
                     }
-                }).promise();
-            };
-        
-            // extend Persons entitySet 
-            persons.getSpeakers = function (options) {
-                return $.Deferred(function (def) {
-                    _.extend(options, {
-                        getFunctionOverride: dataservice.person.getSpeakers
-                    });
-                    $.when(persons.getData(options))
-                        .done(function () { def.resolve(); })
-                        .fail(function () { def.reject(); });
-                }).promise();
-            },
+                    def.resolve(att);
+                }
+            }).promise();
+        };
 
-            persons.getFullPersonById = function (id, callbacks, forceRefresh) {
-                return $.Deferred(function (def) {
-                    var person = persons.getLocalById(id);
-                    if (person.isNullo || person.isBrief() || forceRefresh) {
-                        // if nullo or brief, get fresh from database
-                        dataservice.person.getPerson({
-                            success: function (dto) {
+        // extend Persons entitySet 
+        persons.getSpeakers = function(options) {
+            return $.Deferred(function(def) {
+                _.extend(options, {
+                    getFunctionOverride: dataservice.person.getSpeakers
+                });
+                $.when(persons.getData(options))
+                    .done(function() { def.resolve(); })
+                    .fail(function() { def.reject(); });
+            }).promise();
+        },
+        persons.getFullPersonById = function(id, callbacks, forceRefresh) {
+            return $.Deferred(function(def) {
+                var person = persons.getLocalById(id);
+                if (person.isNullo || person.isBrief() || forceRefresh) {
+                    // if nullo or brief, get fresh from database
+                    dataservice.person.getPerson({
+                            success: function(dto) {
                                 // updates the person returned from getLocalById() above
                                 person = persons.mapDtoToContext(dto);
                                 person.isBrief(false); // now a full person
                                 callbacks.success(person);
                                 def.resolve(dto);
                             },
-                            error: function (response) {
+                            error: function(response) {
                                 logger.error('oops! could not retrieve person ' + id);
-                                if (callbacks && callbacks.error) { callbacks.error(response); }
+                                if (callbacks && callbacks.error) {
+                                    callbacks.error(response);
+                                }
                                 def.reject(response);
                             }
                         },
                         id);
-                    } else {
-                        callbacks.success(person);
-                        def.resolve(person);
-                    }
-                }).promise();
-            },
-
-        // Get the sessions in cache for which this person is 
+                } else {
+                    callbacks.success(person);
+                    def.resolve(person);
+                }
+            }).promise();
+        },
+            // Get the sessions in cache for which this person is 
         // a speaker from local data (no 'promise')
-            persons.getLocalSpeakerSessions = function (personId) {
-                return speakerSessions.getLocalSessionsBySpeakerId(personId);
-            },
-        //locations extensions
-            locations.getSubLocations = function (location,callbacks) {
-                return $.Deferred(function (def) {
-                    var loc = location;
-                    dataservice.location.getSubLocations({
-                        success: function (dto) {
-                            location.locations(dto);
-                            if (callbacks &&  callbacks.success) { callbacks.success(dto); }
-                        },
-                        error: function (response) {
-                            logger.error('oops! could not retrieve state provinces' + id);
-                            if (callbacks && callbacks.error) { callbacks.error(response); }
-                            def.reject(response);
+        persons.getLocalSpeakerSessions = function(personId) {
+            return speakerSessions.getLocalSessionsBySpeakerId(personId);
+        },
+            //locations extensions
+        locations.getSubLocations = function(location, callbacks) {
+            return $.Deferred(function(def) {
+                var loc = location;
+                dataservice.location.getSubLocations({
+                    success: function (dto) {
+                        var items = [];
+                        for (var index = 0; index < dto.length; index++) {
+                            items.push(locations.mapDtoToContext(dto[index]));
                         }
-                    })
-                }).promise();
-            };
+                        console.log(loc.name());
+                        location.locations(items);
+                        if (callbacks && callbacks.success) {
+                            callbacks.success(dto);
+                        }
+                    },
+                    error: function(response) {
+                        logger.error('oops! could not retrieve state provinces' + id);
+                        if (callbacks && callbacks.error) {
+                            callbacks.error(response);
+                        }
+                        def.reject(response);
+                    }
+                });
+            }).promise();
+        };
         var datacontext = {
             attendance: attendance,
             persons: persons,
@@ -397,13 +437,13 @@
             sessions: sessions,
             speakerSessions: speakerSessions,
             timeslots: timeslots,
-            bookings:bookings,
+            bookings: bookings,
             tracks: tracks,
-            locations:locations
+            locations: locations
         };
-        
+
         // We did this so we can access the datacontext during its construction
         model.setDataContext(datacontext);
 
         return datacontext;
-});
+    });

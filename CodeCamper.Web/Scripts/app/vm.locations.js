@@ -4,6 +4,7 @@
     var init = function () {
         //Bind jQuery Delegated Events
         eventDelegates.countriesSelect(onCountrySelected);
+        eventDelegates.stateProvincesSelect(onStateProvinceSelected);
     };
     activate = function(routeData, callback) {
         messenger.publish.viewModelActivated({ canleaveCallback: canLeave });
@@ -11,21 +12,22 @@
         //call data
         getLocations();
     };
-    onCountrySelected = function(){
+    onCountrySelected = function () {
         getSubLocations(arguments[0]);
     },
+    onStateProvinceSelected = function () {
+        var location = arguments[0];
+        if (!location.locations()) {
+            $.when(datacontext.locations.getSubLocations(location));
+        }
+            
+    };
     tmplName = function () {
         return 'locations.view';
     };
     getSubLocations = function (location) {
         if (!location.locations()) {
-            $.when(datacontext.locations.getSubLocations(location));
-            //$.when(datacontext.locations.getSubLocations(1, {
-            //    success: function (data) {
-            //        location.stateProvinces(data);
-            //        console.log(location.stateProvinces());
-            //    }
-            //}));
+            $.when(datacontext.locations.getSubLocations(location));   
         }
     };
     getLocations = function () {

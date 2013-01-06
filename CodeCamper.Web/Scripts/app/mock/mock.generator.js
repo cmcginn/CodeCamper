@@ -138,7 +138,7 @@
             generateSubLocations = function () {
                 var data = $.mockJSON.generateFromTemplate({
                     'locations|62-62': [{
-                        'id|+1': 1,
+                        'id|+1': Math.floor(Math.random() * 11000),
                         name: '@STATEPROVINCES'
                     }]
                 });
